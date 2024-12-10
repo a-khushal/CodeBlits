@@ -6,3 +6,33 @@
   --background: #ffffff;
   --foreground: #171717;
 }
+
+/* Split.js styles */
+.split {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+}
+
+.gutter {
+  background-color: #f3f4f6;
+  background-repeat: no-repeat;
+  background-position: 50%;
+  width: 10px !important;
+}
+
+.gutter:hover {
+  background-color: #e5e7eb;
+}
+
+.gutter.gutter-horizontal {
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+  cursor: col-resize;
+}
+
+/* Ensure split panes take full height */
+.split > * {
+  height: 100%;
+  overflow: auto;
+}

@@ -3,6 +3,7 @@
 import React from 'react';
 import Logo from './ui/logo';
 import NavLinks from './ui/navLinks';
+import Link from 'next/link';
 
 const AppBar = () => {
   // const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -12,11 +13,18 @@ const AppBar = () => {
   // };
 
   return (
-    <nav className="bg-white shadow-md">
+    <nav className="bg-white shadow-md border border-slate-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          <Logo />
-          
+          <div className='flex justify-center items-center gap-10'>
+            <Logo />
+            <Link
+                href="/problems"
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+              >
+                Problems
+              </Link>
+          </div>
           {/* Desktop Navigation */}
           <div>
             <NavLinks />
