@@ -4,9 +4,9 @@
   "type": "module",
   "private": true,
   "exports": {
-    "./button": "./src/button.tsx",
-    "./card": "./src/card.tsx",
-    "./code": "./src/code.tsx"
+    "./logo": "./src/logo.tsx",
+    "./navLinks": "./src/navLinks.tsx",
+    "./mobileView": "./src/mobileView.tsx"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
@@ -23,6 +23,7 @@
     "typescript": "5.5.4"
   },
   "dependencies": {
+    "lucide-react": "^0.468.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   }
