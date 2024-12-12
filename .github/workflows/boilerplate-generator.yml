@@ -1,0 +1,38 @@
+name: Generate Boilerplate Code
+
+on:
+  push:
+    paths:
+      - app/problems/**/structure.md
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the repository
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Step 2: Set up Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    # Step 3: Install dependencies (if any)
+    - name: Install dependencies
+      run: npm install
+
+    # Step 4: Run the boilerplate generation script
+    - name: Generate Boilerplate
+      run: node path/to/your/script.js
+
+    # Step 5: Commit and push generated files back to the repository
+    - name: Commit and push changes
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add .
+        git commit -m "Generated boilerplate code for structure.md"
+        git push

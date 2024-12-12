@@ -1,4 +1,4 @@
-Problem Name: "Sum of two numbers"
+Problem Name: Sum of two numbers
 Function Name: sum
 Input Structure: 
 Input Field: int num1
