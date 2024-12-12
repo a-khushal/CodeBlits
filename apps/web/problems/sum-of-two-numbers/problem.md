@@ -1,4 +1,4 @@
-## Two Sum
+## Sum of two numbers
 
 Given two number add these two numbers and return the result
 
