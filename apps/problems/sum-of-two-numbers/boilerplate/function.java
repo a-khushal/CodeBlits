@@ -1,5 +1,5 @@
 class Solution {
-	public int sum(int num1, int num2) {
+	public List<Float> sum(List<Integer> num1, List<> num2, int num3) {
 		// write your code here
 
 	}

@@ -3,8 +3,9 @@ import path from "path"
 
 const problemFolderName = process.argv[2];
 const basePath = path.resolve(__dirname, '../../problems');
-const filePath = path.join(basePath, `/${problemFolderName}/structure.md`);
-const folderPath = path.join(basePath, `/${problemFolderName}/boilerplate`);
+const structureFilePath = path.join(basePath, `/${problemFolderName}/structure.md`);
+const boilerplateFolderPath = path.join(basePath, `/${problemFolderName}/boilerplate`);
+const fullBoilerplateFolderPath = path.join(basePath, `/${problemFolderName}/fullboilerplate`);
 
 function getFromat(parts: string[][]) {
     let problemName = '';
@@ -90,19 +91,62 @@ interface PayloadType {
     outputField: string;
 }
 
-function getFormatedCodeForJAVA(payload: PayloadType) {
+function getPartialCodeForJAVA(payload: PayloadType) {
     return `class Solution {\n\tpublic ${Javatypes(payload.outputField.split(' ')[0])} ${payload.functionName}(${payload.inputFields.map((inputField, index) => Javatypes(inputField.split(" ")[0]) + " " + inputField.split(" ")[1] + (index < payload.inputFields.length - 1 ? ',' : '')).join(' ')}) {\n\t\t// write your code here\n\n\t}\n}`;
 }
  
-function getFormatedCodeForJS(payload: PayloadType) {
+function getPartialCodeForJS(payload: PayloadType) {
     return `function ${payload.functionName}(${payload.inputFields.map((inputField, index) => inputField.split(' ')[1] + (index < payload.inputFields.length - 1 ? ', ' : '')).join('')}) {\n\t// write your code here\n\n}`;
 }
 
-function getFormatedCodeForCPP(payload: PayloadType) {
+function getPartialCodeForCPP(payload: PayloadType) {
     return`${payload.outputField.split(' ')[0]} ${payload.functionName}(${payload.inputFields.map((inputField, index) => inputField + (index < payload.inputFields.length - 1 ? ', ' : '')).join('')}) {\n\t// write your code here\n\n}`;
 }
 
-function parseStructure(structure: any) {
+function getFullCodeForCPP(payload: PayloadType) {
+    return (
+        `#include <bits/stdc++.h>\n\n` +
+        `using namespace std;\n\n` +
+        `// User code here //\n\n` +
+        `int main(void) {\n` +
+        payload.inputFields.map((inputField) => {
+            const [type, variableName] = inputField.split(" ");
+            if (type.includes("vector<")) {
+                // Extract the type inside vector<>
+                const vectorTypeMatch = type.match(/vector<(.+)>/);
+                const vectorType = vectorTypeMatch ? vectorTypeMatch[1] : "int"; // Default to int if no match
+                return (
+                    `    int size_${variableName};\n` +
+                    `    std::cin >> size_${variableName};\n` +
+                    `    vector<${vectorType}> ${variableName};\n` +
+                    `    for (int i = 0; i < size_${variableName}; i++) {\n` +
+                    `        ${vectorType} ${variableName}_i;\n` +
+                    `        std::cin >> ${variableName}_i;\n` +
+                    `        ${variableName}.push_back(${variableName}_i);\n` +
+                    `    }\n`
+                );
+            } else {
+                return (
+                    `    ${type} ${variableName};\n` +
+                    `    std::cin >> ${variableName};\n`
+                );
+            }
+        }).join('') +
+        `\n\t${payload.outputField.split(" ")[0]} result = ${payload.functionName}(` +
+        payload.inputFields
+            .map((inputField, index) => {
+                const variableName = inputField.split(" ")[1];
+                return variableName + (index < payload.inputFields.length - 1 ? ', ' : '');
+            })
+            .join('') +
+        `);\n` +
+        `    std::cout << result << endl;\n` +
+        `    return 0;\n` +
+        `}`
+    );        
+}
+
+function parseStructure(structure: string) {
     const lines = structure.split("\n")
 
     const split = lines.map((line: any, idx: any) => {
@@ -119,31 +163,43 @@ function parseStructure(structure: any) {
     const payload = getFromat(split)
 
     try {
-        fs.mkdirSync(folderPath, { recursive: true });
+        fs.mkdirSync(boilerplateFolderPath, { recursive: true });
     } catch (err) {
         console.log('Error while creating folder:', err);
     }
 
     try {
-        fs.writeFileSync(`${folderPath}/function.java`, getFormatedCodeForJAVA(payload))
+        fs.mkdirSync(fullBoilerplateFolderPath, { recursive: true });
+    } catch (err) {
+        console.log('Error while creating folder:', err);
+    }
+
+    try {
+        fs.writeFileSync(`${boilerplateFolderPath}/function.java`, getPartialCodeForJAVA(payload))
     } catch(err) {
         console.error(err);
     }
 
     try {
-        fs.writeFileSync(`${folderPath}/function.js`, getFormatedCodeForJS(payload))
+        fs.writeFileSync(`${boilerplateFolderPath}/function.js`, getPartialCodeForJS(payload))
     } catch(err) {
         console.error(err);
     }
 
     try {
-        fs.writeFileSync(`${folderPath}/function.cpp`, getFormatedCodeForCPP(payload))
+        fs.writeFileSync(`${boilerplateFolderPath}/function.cpp`, getPartialCodeForCPP(payload))
+    } catch(err) {
+        console.error(err);
+    }
+
+    try {
+        fs.writeFileSync(`${fullBoilerplateFolderPath}/main.cpp`, getFullCodeForCPP(payload))
     } catch(err) {
         console.error(err);
     }
 }
 
-fs.readFile(filePath, (err, data) => {
+fs.readFile(structureFilePath, (err, data) => {
     if (err) throw err;
     const structure = data.toString();
     parseStructure(structure)
