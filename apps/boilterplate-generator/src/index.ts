@@ -42,7 +42,7 @@ function wrapperTypes(type: string): string {
     switch(type) {
         case "int": return "Integer";
         case "boolean": return "Boolean";
-        case "string": return "String";
+        case "String": return "String";
         case "float": return "Float";
         case "double": return "Double";
         case "char": return "Character";
@@ -92,7 +92,21 @@ interface PayloadType {
 }
 
 function getPartialCodeForJAVA(payload: PayloadType) {
-    return `class Solution {\n\tpublic ${Javatypes(payload.outputField.split(' ')[0])} ${payload.functionName}(${payload.inputFields.map((inputField, index) => Javatypes(inputField.split(" ")[0]) + " " + inputField.split(" ")[1] + (index < payload.inputFields.length - 1 ? ',' : '')).join(' ')}) {\n\t\t// write your code here\n\n\t}\n}`;
+    return `public ${Javatypes(payload.outputField.split(' ')[0])} ${payload.functionName}(${payload.inputFields
+        .map((inputField) => {
+            let [type, variableName] = inputField.split(" ");
+            type = Javatypes(type);
+
+            if (type.startsWith("List<")) {
+                const listTypeMatch = type.match(/List<(.+)>/);
+                const listType = listTypeMatch ? wrapperToNormal(listTypeMatch[1]) : wrapperToNormal("Integer");
+                return `${listType}[] ${variableName}`;
+            } else {
+                return `${type} ${variableName}`;
+            }
+        })
+        .join(", ")}) {
+    // write your code here\n\n}`;
 }
  
 function getPartialCodeForJS(payload: PayloadType) {
@@ -146,6 +160,77 @@ function getFullCodeForCPP(payload: PayloadType) {
     );        
 }
 
+function wrapperToNormal(type: string): string {
+    switch(type) {
+        case "Integer": return "int";
+        case "Boolean": return "boolean";
+        case "String": return "String";
+        case "Float": return "float";
+        case "Double": return "double";
+        case "Character": return "char";
+        case "Long": return "long";
+        case "Short": return "short";
+        case "Byte": return "byte";
+        default: return "";
+    }
+}
+
+function getFullCodeForJAVA(payload: PayloadType) {
+    return (
+        `import java.util.*;\n\n` +
+        `public class solution {\n` +
+        `    // User code here //\n\n` +
+        `    public static void main (String[] args) {\n` +
+        `        Scanner sc = new Scanner(System.in);\n` +
+            payload.inputFields.map((inputField) => {
+                let [type, variableName] = inputField.split(" ");
+                type = Javatypes(type)
+                if(type.startsWith("List<")) {
+                    const listTypeMatch = type.match(/List<(.+)>/);
+                    const listType = listTypeMatch ? wrapperToNormal(listTypeMatch[1]) : wrapperToNormal("Integer"); 
+                    return (  
+                        `        int ${variableName}_size;\n` +
+                        `        ${variableName}_size = sc.nextInt();\n` +
+                        `        ${listType}[] ${variableName} = new ${listType}[${variableName}_size];\n` +
+                        `        for (int i = 0; i < ${variableName}_size; i++) {\n` +
+                        `            ${variableName}[i] = sc.next${listType.charAt(0).toUpperCase() + listType.slice(1)}();\n` +
+                        `        }\n`
+                    )
+                } else {
+                    if(type == 'char') {
+                        return (
+                            `        ${type} ${variableName};\n` +
+                            `        ${variableName} = sc.next().charAt(0);\n`
+                            
+                        )
+                    } else if(type == 'String') {
+                        return (
+                            `        String ${variableName};\n` +
+                            `        ${variableName} = sc.nextLine();\n`
+                        )
+                    } else {
+                        return (
+                            `        ${type} ${variableName};\n` +
+                            `        ${variableName} = sc.next${type.charAt(0).toUpperCase() + type.slice(1)}();\n`
+                        )
+                    }
+                    
+                }
+            }).join('') +
+        `        ${Javatypes(payload.outputField.split(" ")[0])} result = ${payload.functionName}(` +
+        payload.inputFields
+            .map((inputField, index) => {
+                const variableName = inputField.split(" ")[1];
+                return variableName + (index < payload.inputFields.length - 1 ? ', ' : '');
+            })
+            .join('') +
+        `);\n` +
+        `        System.out.println(result);\n` +
+        `    }\n` +
+        `}\n`
+    );    
+}
+
 function parseStructure(structure: string) {
     const lines = structure.split("\n")
 
@@ -193,7 +278,13 @@ function parseStructure(structure: string) {
     }
 
     try {
-        fs.writeFileSync(`${fullBoilerplateFolderPath}/main.cpp`, getFullCodeForCPP(payload))
+        fs.writeFileSync(`${fullBoilerplateFolderPath}/solution.cpp`, getFullCodeForCPP(payload))
+    } catch(err) {
+        console.error(err);
+    }
+
+    try {
+        fs.writeFileSync(`${fullBoilerplateFolderPath}/solution.java`, getFullCodeForJAVA(payload))
     } catch(err) {
         console.error(err);
     }
