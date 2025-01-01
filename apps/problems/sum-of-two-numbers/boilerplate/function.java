@@ -1,6 +1,4 @@
-class Solution {
-	public List<Float> sum(List<Integer> num1, List<> num2, int num3) {
-		// write your code here
+public List<Float> sum(int[] num1, String[] arr, char ch) {
+    // write your code here
 
-	}
 }

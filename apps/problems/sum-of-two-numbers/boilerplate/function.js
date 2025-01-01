@@ -1,4 +1,4 @@
-function sum(num1, num2, num3) {
+function sum(num1, arr, ch) {
 	// write your code here
 
 }

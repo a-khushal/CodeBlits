@@ -13,18 +13,18 @@ int main(void) {
         std::cin >> num1_i;
         num1.push_back(num1_i);
     }
-    int size_num2;
-    std::cin >> size_num2;
-    vector<string> num2;
-    for (int i = 0; i < size_num2; i++) {
-        string num2_i;
-        std::cin >> num2_i;
-        num2.push_back(num2_i);
+    int size_arr;
+    std::cin >> size_arr;
+    vector<string> arr;
+    for (int i = 0; i < size_arr; i++) {
+        string arr_i;
+        std::cin >> arr_i;
+        arr.push_back(arr_i);
     }
-    int num3;
-    std::cin >> num3;
+    char ch;
+    std::cin >> ch;
 
-	vector<float> result = sum(num1, num2, num3);
+	vector<float> result = sum(num1, arr, ch);
     std::cout << result << endl;
     return 0;
 }
