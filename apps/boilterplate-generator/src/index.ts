@@ -192,10 +192,17 @@ function getFullCodeForJAVA(payload: PayloadType) {
                         `        int ${variableName}_size;\n` +
                         `        ${variableName}_size = sc.nextInt();\n` +
                         `        ${listType}[] ${variableName} = new ${listType}[${variableName}_size];\n` +
-                        `        for (int i = 0; i < ${variableName}_size; i++) {\n` +
-                        `            ${variableName}[i] = sc.next${listType.charAt(0).toUpperCase() + listType.slice(1)}();\n` +
-                        `        }\n`
-                    )
+                        (listType !== 'String' ? 
+                            `        for (int i = 0; i < ${variableName}_size; i++) {\n` +
+                            `            ${variableName}[i] = sc.next${listType.charAt(0).toUpperCase() + listType.slice(1)}();\n` +
+                            `        }\n`
+                            : 
+                            `        sc.nextLine(); // Consume the leftover newline character\n` +
+                            `        for (int i = 0; i < ${variableName}_size; i++) {\n` +
+                            `            ${variableName}[i] = sc.nextLine();\n` +
+                            `        }\n`
+                        )
+                    )                    
                 } else {
                     if(type == 'char') {
                         return (
